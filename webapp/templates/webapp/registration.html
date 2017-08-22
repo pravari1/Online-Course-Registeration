@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% load staticfiles%}
+<link rel='stylesheet' href="/static/webapp/css/bootstrap.min.css" type="text/css">
+<!--<link rel="script"  href="/static/webapp/js/jquery-3.2.1.min.js" >
+<link   rel="script" href="/static/webapp/js/jquery.min.js">-->
+</head>
+	<script type="text/javascript" src="/static/webapp/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/webapp/js/bootstrap.min.js"></script>
+	
+  <form action="{% url 'registerationForm' %}" method="post" onsubmit="return validateForm()">  {% csrf_token %}
+		<input type="hidden" id="term"  name="term" value = "{{term}}">
+	  <div class="form-group">
+	    <label for="bnumber">Bnumber*</label>
+	    <input type="text" class="form-control" id="bnumber" minlength="9" name="bnumber" placeholder="B00123456" required>
+	  </div>
+	  <div class="form-group">
+	    <label for="lastname">Last Name*</label>
+	    <input type="text" name="last_name" class="form-control" id="lastname" required>
+	  </div>
+	  <div class="form-group">
+	    <label for="firstname">First Name*</label>
+	    <input type="text" name="first_name" class="form-control" id="firstname" required>
+	  </div>
+	 	  <div class="form-group">
+	  		<label class="radio control-label">Program*</label>
+		  	<div class="radio">
+			  <label>
+			    <input type="radio" name="program" id="programMS" value="MS" required>MS
+			  </label>
+			</div>
+			<div class="radio">
+			  <label>
+			    <input type="radio" name="program" id="programPHD" value="PHD" required>PHD
+			  </label>
+			</div>
+		</div>
+		<div>
+	  		<label class="radio control-label">Required Courses-How Many?*</label>
+	  		<p>Indicate how many required courses you want to take.</p>
+		  	<div class="radio">
+			  <label>
+			    <input type="radio" name="required_course" id="reqCourse0" value="0" required>0
+			  </label>
+			</div>
+			<div class="radio">
+			  <label>
+			    <input type="radio" name="required_course" id="reqCourse1" value="1" required>1
+			  </label>
+			</div>
+			<div class="radio">
+			  <label>
+			    <input type="radio" name="required_course" id="reqCourse2" value="2" required>2
+			  </label>
+			</div>
+			<div class="radio">
+			  <label>
+			    <input type="radio" name="required_course" id="reqCourse3" value="3" required>3
+			  </label>
+			</div>
+		</div>
+		<div>
+	  		<label class="radio control-label">Required Courses-My Preferences*</label>
+	  		<p>Key: 1=My top preference... 3=My lowest preference. Rank those courses you still need to take (or repeat for an improved grade) from these offered. "Remove As A Choice" is only used to remove a course you no longer want as there is no way to 'unclick' a choice within a row. Course descriptions link: http://www.binghamton.edu/cs/grad/courses.html. INDICATE YOUR INSTRUCTOR PREFERENCES BY SELECTING THE CORRECT SECTION NUMBER.</p>
+		  	<table class="table table-striped">
+				<tr>
+					<td>
+						<label class="radio control-label">Course Name</label>
+					</td>
+					<td>
+						<label class="radio control-label">1</label>
+					</td>
+					<td>
+						<label class="radio control-label">2</label>
+					</td>
+					<td>
+						<label class="radio control-label">3</label>
+					</td>
+					<td>
+						<label class="radio control-label">Remove as Choice</label>
+					</td>
+				</tr>
+				{% for cou in requiredCourses  %}
+					<tr>
+						<td>
+							<label>{{cou.course_name}}</label>
+						</td>
+						<td>
+							<div class="radio">
+							  <label>
+								<input type="radio" name="core_prference_1" id="core_prefernce_1_{{cou.course_id}}1" value="{{cou.course_id}}" onclick="removeOtherChoices(this)" required>
+							  </label>
+						  
+							</div>
+						</td>
+						<td>
+							<div class="radio">
+							  <label>
+								<input type="radio" name="core_prference_2"  id="core_prefernce_2_{{cou.course_id}}2" value="{{cou.course_id}}" onclick="removeOtherChoices(this)" required>
+							  </label>
+						  
+							</div>
+						</td>
+						<td>
+							<div class="radio">
+							  <label>
+								<input type="radio" name="core_prference_3"  id="core_prefernce_3_{{cou.course_id}}3" value="{{cou.course_id}}" onclick="removeOtherChoices(this)" required>
+							  </label>
+						  
+							</div>
+						</td>
+						<td>
+							<div class="radio">
+							  <label>
+								<input type="radio" name="remove_as_choice_prefernce" id="remove_prefernce_as_choice_{{cou.course_id}}" value="" onclick="removeOtherChoices(this)">
+							  </label>
+						  
+							</div>
+						</td>
+						
+								
+					</tr>
+				{% endfor %}
+			</table>
+		</div>
+		
+		<div>
+	  		<label class="radio control-label">Other Courses-My Preferences</label>
+	  		<p>Choose and rank four courses, failure to rank four courses may result in one being chosen for you due to space availability, conflicts, etc. RANK: 1=My top preference... 4=My lowest preference.. "Remove As A Choice" is only used to remove a course you no longer want as there is no way to 'unclick' a choice within a row. Course descriptions link: http://www.binghamton.edu/cs/grad/courses.html. If you are interested in CS 580U, please talk to Professor Lander. We are expecting new faculty hires will provide new courses in the Fall. We will announce them in the summer and provide a process for requesting changes to your Fall classes.</p>
+		  	<table class="table table-striped">
+				<tr>
+					<td>
+						<label class="radio control-label">Course Name</label>
+					</td>
+					<td>
+						<label class="radio control-label">1</label>
+					</td>
+					<td>
+						<label class="radio control-label">2</label>
+					</td>
+					<td>
+						<label class="radio control-label">3</label>
+					</td>
+					<td>
+						<label class="radio control-label">4</label>
+					</td>
+					<td>
+						<label class="radio control-label">Remove as Choice</label>
+					</td>
+				</tr>
+				{% for cou in otherCourse  %}
+					<tr>
+						<td>
+							<label>{{cou.course_name}}</label>
+						</td>
+						<td>
+							<div class="radio">
+							  <label>
+								<input type="radio" name="prefernce_1" id="prefernce_1_{{cou.course_id}}" value="{{cou.course_id}}" onclick="removeOtherChoices(this)" required>
+							  </label>
+						  
+							</div>
+						</td>
+						<td>
+							<div class="radio">
+							  <label>
+								<input type="radio" name="prefernce_2" id="prefernce_2_{{cou.course_id}}" value="{{cou.course_id}}" onclick="removeOtherChoices(this)" required>
+							  </label>
+						  
+							</div>
+						</td>
+						<td>
+							<div class="radio">
+							  <label>
+								<input type="radio" name="prefernce_3" id="prefernce_3_{{cou.course_id}}" value="{{cou.course_id}}" onclick="removeOtherChoices(this)" required>
+							  </label>
+						  
+							</div>
+						</td>
+						<td>
+							<div class="radio">
+							  <label>
+								<input type="radio" name="prefernce_4" id="prefernce_4_{{cou.course_id}}" value="{{cou.course_id}}" onclick="removeOtherChoices(this)" required>
+							  </label>
+						  
+							</div>
+						</td>
+						<td>
+							<div class="radio">
+							  <label>
+								<input type="radio" name="remove_as_choice_core_prference" id="prefernce_remove_as_choice_{{cou.course_id}}" onclick="removeOtherChoices(this)" value="" >
+							  </label>
+						  
+							</div>
+						</td>
+								
+					</tr>
+				{% endfor %}
+			</table>
+		</div>
+		<div>
+	  		<label class="radio control-label">Do you still need a large software development (long programming) course? *</label>
+			<p>Courses that satisfy the requirement this semester are: {{longProgCourseList}}</p>
+		  	<div class="radio">
+			  <label>
+			    <input type="radio" name="longProgCourse" id="longProgCourseYes" value="True" required>Yes
+			  </label>
+			</div>
+			<div class="radio">
+			  <label>
+			    <input type="radio" name="longProgCourse" id="longProgCourseNo" value="False" required>No
+			  </label>
+			</div>
+		</div>
+		<div>
+	  		<label class="radio control-label">Do you need to be full-time with 12 credits? *</label>
+			<p>If you will have less than 24 credits, we can register you in 3 credits of CS707 in order to be full-time.</p>
+		  	<div class="radio">
+			  <label>
+			    <input type="radio" name="enroll_fulltime" id="required12CreditsYes" value="True" required>Yes
+			  </label>
+			</div>
+			<div class="radio">
+			  <label>
+			    <input type="radio" name="enroll_fulltime" id="required12CreditsNo" value="False" required>No
+			  </label>
+			</div>
+		</div>
+		<div>
+	  		<label class="radio control-label">If you believe you can handle 4 courses, you must wait until everyone is registered (including new students). Indicate your request for a fourth course here.</label>
+			<p>Provide the course number, e.g. CS576</p>
+		  	<input type="text" class="form-control" name='comments'id="fourthCourse">
+		</div>
+		<div>
+	  		<label class="radio control-label">The "Third Semester Problem" *</label>
+			<p>The following web page has some very important information that COULD COST YOU A LOT OF MONEY (approx. $1,000): <a href"http://www.binghamton.edu/student-accounts/tuitionadjustments.html">http://www.binghamton.edu/student-accounts/tuitionadjustments.html</a>. Please refer to it to understand costs associated with dropping a course (even if you add a different course/section) and the possibility of being charged for 30% of the tuition for the dropped course. If you will be in nine (9) credits or less, please read the following statement and indicate if you agree with it, you do not agree with it or it does not apply to you. "I UNDERSTAND THAT I WILL BE TAKING LESS THAN 12 CREDITS AND I MUST REQUEST THAT THE CS DEPT. MAKE ALL CHANGES TO MY FALL 2017 CLASSES BEFORE THE END OF THE FIRST WEEK OF CLASSES IN THE SEMESTER. IN ORDER TO ENSURE THAT THERE IS TIME TO MAKE THE CHANGES, I WILL SUBMIT THE REQUEST IN WRITING TO THE GRADUATE DIRECTOR BY MONDAY, AUGUST 28TH."
+			</p>
+			<div class="radio">
+			  <label>
+			    <input type="radio" name="terms" id="termsAgree" value="True" required>I agree
+			  </label>
+			</div>
+			<div class="radio">
+			  <label>
+			    <input type="radio" name="terms" id="termsDisagree" value="False" required>I disagree (please contact the Graduate Director)
+			  </label>
+			</div>
+		  	<div class="radio">
+			  <label>
+			    <input type="radio" name="terms" id="termsDoesNotApply" value="NA" required>It does not apply to me
+			  </label>
+			</div> 	
+
+		</div>
+		<button class="btn btn-info btn-lg" type="submit">Submit</button>
+  </form>
+   <!-- Modal -->
+  <button id="mybutton" style="display:none;" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Others prefernce</h4>
+        </div>
+        <div id="dialogContent" class="modal-body">
+          <p>Some text in the modal.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  <script type="text/javascript">
+
+
+function removeOtherChoices(ele){
+	
+	console.log("name="+ele.id);
+	var id = ele.id;
+	var index = id.indexOf("prefernce");
+	console.log("index="+index);
+	var courseName = id.substring(id.lastIndexOf("_")+1,id.length);
+	var core = "False";
+	var preference = 1;
+	if(index == 0){
+		console.log("prefernce_1_"+id.substring(id.lastIndexOf("_"),id.length));
+		$("core_prefernce_1"+id.substring(id.lastIndexOf("_"),id.length)).prop("checked", false);
+		$("core_prefernce_2"+id.substring(id.lastIndexOf("_"),id.length)).prop("checked", false);
+		$("core_prefernce_3"+id.substring(id.lastIndexOf("_"),id.length)).prop("checked", false);
+		$("core_prefernce_4"+id.substring(id.lastIndexOf("_"),id.length)).prop("checked", false);
+		$("prefernce_remove_as_choice"+id.substring(id.lastIndexOf("_"),id.length)).prop("checked", false);
+		
+		var mysplit= id.split("_");
+		preference = mysplit[1];
+		$(id).prop("checked",true);
+	}else{
+		core = "True"
+		console.log("core_prefernce_1"+id.substring(id.lastIndexOf("_"),id.length));
+		$("core_prefernce_1"+id.substring(id.lastIndexOf("_"),id.length)).prop("checked", false);
+		$("core_prefernce_2"+id.substring(id.lastIndexOf("_"),id.length)).prop("checked", false);
+		$("core_prefernce_3"+id.substring(id.lastIndexOf("_"),id.length)).prop("checked", false);
+		$("remove_prefernce_as_choice"+id.substring(id.lastIndexOf("_"),id.length)).prop("checked", false);
+	
+		$(id).prop("checked",true);
+		var mysplit= id.split("_");
+		preference = mysplit[2];
+	}
+	console.log("Befor ajax"+index);
+	if( index >=0){
+		$.ajax({
+			url: '{% url "getPreferenceCount"%}',
+			data: {
+			  'courseName': courseName,
+			  'core' : core,
+			  'term' : document.getElementById("term").value,
+			  'preference' : preference 
+			},
+			dataType: 'json',
+			success: function (data) {
+				console.log("Data=="+data.count);
+				if(data.count == 0){
+					$("#mybutton").click();
+					document.getElementById("dialogContent").innerHTML = "No students have given the prefernce for "+ courseName + " course";
+				}else{
+					$("#mybutton").click();
+					document.getElementById("dialogContent").innerHTML = data.count+" students have given preference for " + courseName + " course"; 
+				 }
+			}
+		});
+		  
+	}
+}//end function
+</script>
+</html>
